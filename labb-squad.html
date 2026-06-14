@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ก๊วนลาบ • หมายเรียกพลรบ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#23201c;
+    --paper:#f4ead4;          /* roasted-rice paper */
+    --paper-2:#efe1c3;
+    --chili:#c8341f;          /* พริกแดง */
+    --chili-dk:#9c2412;
+    --olive:#4a5233;          /* เขียวขี้ม้า */
+    --herb:#88a13a;           /* ผักชีฝรั่ง */
+    --padaek:#7a4f2a;         /* น้ำปลาร้า */
+    --line:#241f1b;
+    --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;
+    background:var(--olive);
+    color:var(--ink);
+    min-height:100dvh;
+    display:flex;align-items:center;justify-content:center;
+    padding:16px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .app{
+    width:100%;max-width:460px;
+    background:var(--paper);
+    border:3px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    position:relative;
+    min-height:min(760px,92dvh);
+    display:flex;flex-direction:column;
+  }
+  /* ---- top strip ---- */
+  .strip{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:3px solid var(--line);
+    background:var(--chili);color:var(--paper);
+    font-family:"Kanit",sans-serif;
+  }
+  .brand{font-weight:800;letter-spacing:.5px;font-size:15px;display:flex;gap:7px;align-items:center}
+  .brand .tag{font-size:10px;background:var(--paper);color:var(--chili);
+    padding:2px 7px;border-radius:999px;font-weight:600;letter-spacing:1px}
+  .dots{display:flex;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--paper);opacity:.55}
+  .dot.on{background:var(--paper);opacity:1}
+  /* ---- screens ---- */
+  .screen{display:none;flex:1;padding:22px 20px 26px;flex-direction:column;animation:in .35s ease}
+  .screen.active{display:flex}
+  @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .eyebrow{font-family:"Kanit",sans-serif;font-weight:600;font-size:11px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--chili-dk);margin:0 0 8px}
+  h1{font-family:"Kanit",sans-serif;font-weight:800;font-size:34px;line-height:1.05;margin:0 0 12px}
+  h2{font-family:"Kanit",sans-serif;font-weight:800;font-size:26px;line-height:1.1;margin:0 0 6px}
+  p{font-size:15px;line-height:1.5;margin:0 0 14px}
+  .muted{color:#5f5848}
+  /* ---- buttons ---- */
+  .btn{
+    font-family:"Kanit",sans-serif;font-weight:600;font-size:17px;
+    background:var(--chili);color:var(--paper);
+    border:3px solid var(--line);border-radius:14px;
+    padding:14px 18px;width:100%;cursor:pointer;
+    box-shadow:4px 4px 0 var(--line);transition:transform .08s, box-shadow .08s;
+  }
+  .btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--line)}
+  .btn.ghost{background:var(--paper);color:var(--ink)}
+  .btn.olive{background:var(--olive);color:var(--paper)}
+  .btn:focus-visible{outline:3px solid var(--padaek);outline-offset:3px}
+  .row{display:flex;gap:10px}
+  .row .btn{flex:1}
+  .spacer{flex:1}
+  /* ---- inputs ---- */
+  label.fld{display:block;font-family:"Kanit",sans-serif;font-weight:600;font-size:13px;
+    letter-spacing:.5px;margin:14px 0 6px}
+  input[type=text],input[type=date],input[type=time]{
+    width:100%;font-family:inherit;font-size:16px;color:var(--ink);
+    background:#fff8ea;border:3px solid var(--line);border-radius:12px;padding:12px 13px;
+  }
+  input:focus-visible{outline:3px solid var(--chili);outline-offset:1px}
+  /* ---- screen 1 art ---- */
+  .crest{font-size:64px;text-align:center;line-height:1;margin:6px 0 4px;
+    filter:drop-shadow(3px 3px 0 rgba(0,0,0,.15))}
+  .stripeline{height:8px;background:repeating-linear-gradient(45deg,var(--chili) 0 14px,var(--paper) 14px 28px);
+    border:3px solid var(--line);border-radius:999px;margin:10px 0 16px}
+  /* ---- GAME ---- */
+  .hud{display:flex;gap:8px;margin-bottom:10px}
+  .hud .box{flex:1;background:#fff8ea;border:3px solid var(--line);border-radius:12px;
+    padding:7px 8px;text-align:center}
+  .hud .k{font-family:"Kanit",sans-serif;font-size:10px;letter-spacing:1px;color:#6b6452}
+  .hud .v{font-family:"Kanit",sans-serif;font-weight:800;font-size:22px;line-height:1}
+  .hud .box.low .v{color:var(--chili);animation:tpulse .5s infinite}
+  @keyframes tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+  .meterwrap{height:14px;background:#fff8ea;border:3px solid var(--line);border-radius:999px;
+    overflow:hidden;margin-bottom:10px}
+  .meter{height:100%;width:0;background:var(--chili);transition:width .15s}
+  .arena{position:relative;flex:1;min-height:320px;background:
+      radial-gradient(circle at 50% 120%, #fff3dc 0 40%, transparent 60%),var(--paper-2);
+    border:3px solid var(--line);border-radius:16px;overflow:hidden;touch-action:none}
+  .pot{position:absolute;left:50%;bottom:-26px;transform:translateX(-50%);
+    width:140px;height:90px;background:var(--olive);border:3px solid var(--line);
+    border-radius:0 0 90px 90px / 0 0 60px 60px;z-index:1;transition:filter .1s,outline .1s}
+  .pot::before{content:"🥣 ครกลาบ";position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+    font-family:"Kanit",sans-serif;font-weight:600;font-size:12px;color:var(--paper)}
+  .pot.target{outline:4px dashed var(--chili);outline-offset:3px;filter:brightness(1.12)}
+  /* chef HUD */
+  .chef-hud{position:absolute;top:6px;left:6px;right:6px;z-index:9;
+    display:flex;align-items:flex-start;gap:8px;pointer-events:none}
+  .chef-outer{flex-shrink:0;animation:chefbob 2.4s ease-in-out infinite}
+  .chef-sprite{width:70px;height:80px;position:relative}
+  .chef-sprite.angry{animation:chefshake .12s linear 5}
+  .chef-base,.chef-face{width:5px;height:5px;position:absolute;top:0;left:0}
+  .steam{position:absolute;top:-4px;width:7px;height:7px;background:#fff8ea;
+    border:2px solid var(--line);border-radius:2px;opacity:0}
+  .chef-sprite.angry .steam{animation:steamrise 1.1s ease-out forwards}
+  .bubble{flex:1;font-family:"Press Start 2P","Kanit",sans-serif;font-size:9.5px;line-height:1.7;
+    background:#fff8ea;border:3px solid var(--line);border-radius:8px;padding:8px 10px;
+    min-height:34px;display:flex;align-items:center;box-shadow:3px 3px 0 var(--line);
+    position:relative;color:var(--ink)}
+  .bubble::after{content:"";position:absolute;left:-9px;top:14px;width:0;height:0;
+    border:6px solid transparent;border-right-color:var(--line)}
+  .bubble::before{content:"";position:absolute;left:-6px;top:15px;width:0;height:0;
+    border:5px solid transparent;border-right-color:#fff8ea;z-index:1}
+  @keyframes chefbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes chefshake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-3px) rotate(-5deg)}75%{transform:translateX(3px) rotate(5deg)}}
+  @keyframes steamrise{0%{opacity:.9;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-22px) scale(1.4)}}
+  /* food chips */
+  .chip{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    width:62px;height:62px;border-radius:50%;border:3px solid var(--line);background:#fff8ea;
+    cursor:grab;font-size:24px;line-height:1;padding:0;font-family:inherit;
+    box-shadow:3px 3px 0 rgba(0,0,0,.2);touch-action:none;user-select:none;z-index:2}
+  .chip small{font-family:"Kanit",sans-serif;font-weight:600;font-size:8.5px;color:var(--ink);margin-top:1px}
+  .chip.bad{background:#e9d7c0;border-style:dashed}
+  .chip.dragging{cursor:grabbing;z-index:20;filter:brightness(1.07)}
+  .chip:focus-visible{outline:3px solid var(--chili)}
+  .chip.golden{background:#fff3b0;box-shadow:0 0 0 3px #ffd54a,3px 3px 0 rgba(0,0,0,.2);
+    animation:goldpulse .55s ease-in-out infinite}
+  @keyframes goldpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  .chip.warn{animation:chipwarn .3s ease-in-out infinite}
+  @keyframes chipwarn{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.86)}}
+  .splat{position:absolute;font-family:"Kanit",sans-serif;font-weight:800;font-size:18px;
+    pointer-events:none;animation:pop .6s ease forwards;z-index:25}
+  @keyframes pop{from{transform:translateY(0);opacity:1}to{transform:translateY(-34px);opacity:0}}
+  .startov{position:absolute;inset:0;background:rgba(36,31,27,.86);color:var(--paper);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    z-index:8;text-align:center;padding:24px}
+  .startov h2{color:var(--paper)}
+  .startov .btn{max-width:200px}
+  .shake{animation:sh .3s}
+  @keyframes sh{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  /* ---- RESULT card ---- */
+  .tag-card{background:var(--ink);color:var(--paper);border-radius:16px;border:3px solid var(--line);
+    padding:18px;position:relative;overflow:hidden}
+  .tag-card::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;
+    border:14px solid rgba(255,255,255,.06);border-radius:50%}
+  .tag-card .rank-k{font-family:"Kanit",sans-serif;font-size:11px;letter-spacing:2px;color:#c9a;opacity:.8}
+  .tag-card .rank{font-family:"Kanit",sans-serif;font-weight:800;font-size:28px;line-height:1.1;margin:2px 0 4px}
+  .tag-card .who{font-size:13px;color:#e7dcc4}
+  .score-pill{display:inline-flex;gap:6px;align-items:center;margin-top:12px;background:var(--chili);
+    border-radius:999px;padding:5px 12px;font-family:"Kanit",sans-serif;font-weight:700;font-size:14px}
+  .desc{font-size:14.5px;line-height:1.5;margin:14px 2px}
+  .role{font-size:14px;background:#fff8ea;border:3px solid var(--line);border-radius:12px;
+    padding:11px 13px;margin:0 0 16px}
+  .role b{font-family:"Kanit",sans-serif}
+  .bars{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+  .bar .blab{display:flex;justify-content:space-between;font-family:"Kanit",sans-serif;
+    font-weight:600;font-size:12px;margin-bottom:3px}
+  .bar .blab .lo{color:var(--olive)}.bar .blab .hi{color:var(--chili-dk)}
+  .track{height:13px;background:#fff8ea;border:3px solid var(--line);border-radius:999px;
+    position:relative;overflow:hidden}
+  .fill{position:absolute;top:0;bottom:0;left:0;background:var(--chili)}
+  .fortune{background:var(--herb);border:3px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:18px}
+  .fortune .k{font-family:"Kanit",sans-serif;font-weight:800;font-size:13px;letter-spacing:1px;margin-bottom:3px}
+  .fortune p{margin:0;font-size:14px}
+  /* ---- WHEEL OF FATE ---- */
+  .wheel-wrap{position:relative;width:220px;height:220px;margin:8px auto 18px}
+  .wheel{width:100%;height:100%;border-radius:50%;border:4px solid var(--line);
+    box-shadow:4px 4px 0 var(--line);position:relative;
+    transition:transform 3.2s cubic-bezier(.18,.66,.16,1.02);
+    background:conic-gradient(from -22.5deg,
+      var(--chili) 0deg 45deg, var(--paper) 45deg 90deg,
+      var(--olive) 90deg 135deg, var(--paper) 135deg 180deg,
+      var(--herb) 180deg 225deg, var(--paper) 225deg 270deg,
+      var(--padaek) 270deg 315deg, var(--paper) 315deg 360deg)}
+  .wheel::after{content:"";position:absolute;inset:38%;background:var(--paper);
+    border:3px solid var(--line);border-radius:50%}
+  .wedge{position:absolute;left:50%;top:50%;width:24px;height:24px;font-size:22px;
+    display:flex;align-items:center;justify-content:center;transform-origin:0 0}
+  .pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:24px;
+    color:var(--chili-dk);z-index:3;filter:drop-shadow(2px 2px 0 var(--line))}
+  .btn:disabled{opacity:.55;cursor:default}
+  .stamp{margin-top:14px;text-align:center;opacity:0;transform:scale(1.6) rotate(-10deg);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .2s}
+  .stamp.show{opacity:1;transform:scale(1) rotate(-3deg)}
+  .stamp .badge{display:inline-block;border:4px solid var(--chili);color:var(--chili-dk);
+    border-radius:14px;padding:8px 14px;font-family:"Kanit",sans-serif;font-weight:800;
+    font-size:13px;letter-spacing:2px;background:rgba(200,52,31,.07)}
+  .stamp p{margin:10px 4px 0;font-size:14px;line-height:1.55}
+  /* ---- DATE ---- */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .chips button{flex:1 1 46%;font-family:"Kanit",sans-serif;font-weight:600;font-size:13px;
+    background:#fff8ea;border:3px solid var(--line);border-radius:12px;padding:10px 6px;cursor:pointer;
+    line-height:1.3;text-align:center}
+  .chips button small{font-weight:500;opacity:.75}
+  .chips button.sel{background:var(--chili);color:var(--paper)}
+  .chips button:focus-visible{outline:3px solid var(--chili);outline-offset:2px}
+  .place-fixed{font-family:"Kanit",sans-serif;font-weight:600;font-size:14px;
+    background:var(--chili);color:var(--paper);border:3px solid var(--line);
+    border-radius:12px;padding:11px 13px;display:flex;align-items:center;
+    justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .place-fixed .locked{font-size:10.5px;font-weight:500;letter-spacing:.5px;
+    background:rgba(0,0,0,.18);padding:3px 9px;border-radius:999px}
+  /* ---- APPLICATION DOC ---- */
+  .doc-card{background:#fff8ea;border:3px dashed var(--line);border-radius:14px;padding:16px;
+    margin-bottom:6px;position:relative;overflow:hidden}
+  .doc-card .stamp2{position:absolute;top:12px;right:-14px;transform:rotate(18deg);
+    border:4px solid var(--chili);color:var(--chili-dk);border-radius:10px;padding:4px 16px 4px 10px;
+    font-family:"Kanit",sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;opacity:.85}
+  .doc-row{display:flex;gap:8px;margin:0 0 9px;font-size:13.5px;line-height:1.5}
+  .doc-row:last-child{margin-bottom:0}
+  .doc-row .dl{font-family:"Kanit",sans-serif;font-weight:700;min-width:84px;
+    flex-shrink:0;color:var(--chili-dk)}
+  .confirm{background:var(--herb);border:3px solid var(--line);border-radius:14px;padding:13px 15px;
+    margin:14px 0 0;font-size:14px;display:none}
+  .confirm.show{display:block;animation:in .3s ease}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:14px;
+    font-family:"Kanit",sans-serif;opacity:0;pointer-events:none;transition:.3s;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .foot{font-size:11px;color:#7a7361;text-align:center;margin-top:10px}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="strip">
+    <div class="brand">🌶️ ก๊วนลาบ <span class="tag">ARMY OF LARB</span></div>
+    <div class="dots">
+      <span class="dot on" data-d="0"></span>
+      <span class="dot" data-d="1"></span>
+      <span class="dot" data-d="2"></span>
+      <span class="dot" data-d="3"></span>
+      <span class="dot" data-d="4"></span>
+      <span class="dot" data-d="5"></span>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 1 : หมายเรียก ============ -->
+  <section class="screen active" id="s0">
+    <p class="eyebrow">หมายเรียกพลรบ • ภารกิจลาบ</p>
+    <div class="crest">🎖️🌶️</div>
+    <h1>มื้อนี้บ่มีลาบ<br>บ่ได้เด้อ</h1>
+    <p class="muted">ก่อนสิเข้าก๊วน ขอพิสูจน์ก่อนว่าเลือดลาบในตัวเจ้าข้นแค่ไหน เล่นมินิเกม<b>ลากของลงครกให้ลาบแซ่บ</b> ภายใต้สายตาคุมเข้มของเชฟใหญ่ รับยศ “ทหารลาบ” ดูดวงลาบประจำสัปดาห์ แล้วล็อกวันนัดลงปฏิทินในตัว</p>
+    <div class="stripeline"></div>
+    <label class="fld" for="nm">ตั้งชื่อในกองลาบ</label>
+    <input type="text" id="nm" maxlength="20" placeholder="เช่น บัก, น้อง, เสี่ย..." autocomplete="off">
+    <div class="spacer"></div>
+    <button class="btn" onclick="go(1)">เข้าค่ายฝึกลาบ →</button>
+    <p class="foot">ใช้เวลา ~1 นาที • เล่นได้ทั้งแตะและคลิก</p>
+  </section>
+
+  <!-- ============ SCREEN 2 : เกม ============ -->
+  <section class="screen" id="s1">
+    <p class="eyebrow">ด่านฝึก • ลากลงครก</p>
+    <h2>ลากของแซ่บลงครก!</h2>
+    <p class="muted" style="margin-bottom:12px">ของจะวิ่งไวจี๊ดและ<b>หายไปเร็ว</b> ลาก <b>ของแซ่บ</b> ลงครกให้ทันก่อนมันจะลอยหายไปตลอดกาล ถ้าเห็นของส่องแสง ✨ รีบคว้า ได้แต้มคูณสอง! ส่วน <b>ของแปลกปลอม</b> (มายองเนส ชีส มะเขือเทศ นม คนไม่รู้ๆๆ และคนเจ้าชู้) ห้ามให้หลุดลงครกเด็ดขาด เชฟกำลังจับตาดูอยู่!</p>
+    <div class="hud">
+      <div class="box"><div class="k">เวลา</div><div class="v" id="time">25</div></div>
+      <div class="box"><div class="k">แต้มแซ่บ</div><div class="v" id="score">0</div></div>
+      <div class="box"><div class="k">คอมโบ</div><div class="v" id="combo">x1</div></div>
+    </div>
+    <div class="meterwrap"><div class="meter" id="meter"></div></div>
+    <div class="arena" id="arena">
+      <div class="chef-hud" id="chefHud">
+        <div class="chef-outer">
+          <div class="chef-sprite" id="chefSprite">
+            <div class="chef-base" id="chefBase"></div>
+            <div class="chef-face" id="chefFace"></div>
+            <span class="steam" style="left:6px"></span>
+            <span class="steam" style="left:30px;animation-delay:.12s"></span>
+            <span class="steam" style="left:50px;animation-delay:.24s"></span>
+          </div>
+        </div>
+        <div class="bubble" id="bubble">เดี๋ยวเชฟจะบอกสูตรลับ... เตรียมมือไว้!</div>
+      </div>
+      <div class="pot" id="pot"></div>
+      <div class="startov" id="startov">
+        <h2>พร้อมลากยัง?</h2>
+        <p style="color:#e7dcc4;margin:0">มีเวลา 25 วิ ของจะวิ่งไวและหายไปไวกว่าเดิม<br>ลากของแซ่บลงครกให้ทันก่อนมันหายไปตลอดกาล!</p>
+        <button class="btn" onclick="startGame()">เริ่มลาก! ✋</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3 : ผลลัพธ์ ============ -->
+  <section class="screen" id="s2">
+    <p class="eyebrow">ผลการฝึก • บัตรประจำตัวทหารลาบ</p>
+    <div class="tag-card">
+      <div class="rank-k">ยศที่ได้รับ</div>
+      <div class="rank" id="rank">—</div>
+      <div class="who" id="who">นามเรียกขาน: —</div>
+      <span class="score-pill">🌶️ <span id="rscore">0</span> แต้มแซ่บ</span>
+    </div>
+    <p class="desc" id="desc"></p>
+    <div class="role"><b>หน้าที่ในก๊วนลาบ:</b> <span id="role"></span></div>
+    <div class="bars" id="bars"></div>
+    <div class="fortune">
+      <div class="k">🔮 ดูดวงลาบประจำสัปดาห์</div>
+      <p id="fortune"></p>
+    </div>
+    <button class="btn olive" onclick="go(3)">ไปลุ้นวงล้อภารกิจ →</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="resetGame()">ฝึกใหม่อีกรอบ</button>
+  </section>
+
+  <!-- ============ SCREEN 4 : วงล้อภารกิจ ============ -->
+  <section class="screen" id="s3">
+    <p class="eyebrow">ก่อนนัด • วงล้อภารกิจ</p>
+    <h2>หมุนวงล้อภารกิจ!</h2>
+    <p class="muted" style="margin-bottom:10px">หมุนได้เรื่อยๆ ตามใจชอบ จะตกช่องไหนก็ได้... แต่ชะตาฟ้าลิขิตไว้แล้วว่าทุกคนต้องรับภารกิจเดียวกัน ห้ามเถียง</p>
+    <div class="wheel-wrap">
+      <div class="pointer">▼</div>
+      <div class="wheel" id="wheel"></div>
+    </div>
+    <button class="btn" id="spinBtn" onclick="spinWheel()">หมุนวงล้อ 🎯</button>
+    <div class="stamp" id="stamp"></div>
+    <div class="spacer"></div>
+    <button class="btn olive" onclick="go(4)">ไปนัดวันบุกโต๊ะลาบ →</button>
+  </section>
+
+  <!-- ============ SCREEN 5 : นัดวัน-เวลา ============ -->
+  <section class="screen" id="s4">
+    <p class="eyebrow">ก่อนปิดภารกิจ • ระดมพล</p>
+    <h2>เลือกวัน-เวลาบุกโต๊ะลาบ</h2>
+    <p class="muted" style="margin-bottom:10px">กฎก๊วน: นัดได้แค่ <b>วันจันทร์–พฤหัส</b> และเวลามีให้เลือกแค่ 2 ออปชันเท่านั้น ห้ามมาช้า ห้ามเรื่องมาก</p>
+    <label class="fld">เลือกวัน</label>
+    <div class="chips" id="dayChips"></div>
+    <label class="fld">เลือกเวลา</label>
+    <div class="chips" id="timeChips">
+      <button data-t="19:00">🕖 1 ทุ่ม<br><small>ที่ร้าน</small></button>
+      <button data-t="20:00">🕗 2 ทุ่ม<br><small>ที่ร้าน</small></button>
+    </div>
+    <label class="fld">สถานที่</label>
+    <div class="place-fixed">📍 ร้านลาบสตูดิโอ <span class="locked">ล็อกแล้ว ห้ามเถียง</span></div>
+    <div class="spacer"></div>
+    <button class="btn" id="checkBtn" onclick="go(5)" disabled>📋 ตรวจเอกสารเข้ากองพันทหารลาบ →</button>
+    <div style="height:10px"></div>
+    <div class="row">
+      <button class="btn ghost" onclick="addGoogle()">📅 Google ปฏิทิน</button>
+      <button class="btn ghost" onclick="downloadICS()">⬇︎ ไฟล์ .ics</button>
+    </div>
+    <div class="confirm" id="confirm"></div>
+  </section>
+
+  <!-- ============ SCREEN 6 : ใบสมัครกองพัน ============ -->
+  <section class="screen" id="s5">
+    <p class="eyebrow">ภารกิจสุดท้าย • ส่งใบสมัคร</p>
+    <h2>เอกสารเข้ากองพันทหารลาบ</h2>
+    <p class="muted" style="margin-bottom:10px">ตรวจสอบข้อมูลให้ดีก่อนส่ง เพราะส่งแล้วเรียกคืนไม่ได้ (เหมือนคำชวนไปกินลาบ)</p>
+    <div class="doc-card" id="docCard"></div>
+    <div class="spacer"></div>
+    <button class="btn olive" onclick="sendApplication()">📨 ส่งใบสมัครเข้ากองพัน</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="go(4)">← แก้ไขวัน/เวลา</button>
+    <p class="foot">เปิดแอปอีเมลของเครื่อง ส่งถึง amfinethx.rock@gmail.com</p>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- navigation ---------------- */
+const screens=[...document.querySelectorAll('.screen')];
+const dots=[...document.querySelectorAll('.dot')];
+function go(i){
+  screens.forEach((s,n)=>s.classList.toggle('active',n===i));
+  dots.forEach((d,n)=>d.classList.toggle('on',n<=i));
+  document.querySelector('.app').scrollTop=0;
+  if(i===2)renderResult();
+  if(i===5)renderApplication();
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
+function playerName(){return (document.getElementById('nm').value||'').trim()||'พลทหารนิรนาม';}
+
+/* ---------------- PIXEL CHEF ---------------- */
+function range(x0,x1,y,c){const a=[];for(let x=x0;x<=x1;x++)a.push([x,y,c]);return a;}
+const UNIT=5;
+const CHEF_PALETTE={H:'#fffaf0',S:'#ddd2b8',R:'#c8341f',W:'#fff3df',F:'#e3ad7c',D:'#c4905f',
+  O:'#4a5233',A:'#f4ead4',P:'#e3ad7c',K:'#23201c',M:'#5a3c24',X:'#ff5a36'};
+const CHEF_BASE=[
+  ...range(5,8,0,'H'),
+  ...range(4,9,1,'H'),
+  ...range(3,10,2,'H'),
+  ...range(3,10,3,'S'),
+  ...range(2,11,4,'R'),
+  [2,5,'R'],[3,5,'W'],[4,5,'R'],[5,5,'W'],[6,5,'R'],[7,5,'W'],[8,5,'R'],[9,5,'W'],[10,5,'R'],[11,5,'R'],
+  ...range(2,11,6,'F'),
+  ...range(2,11,7,'F'),
+  ...range(2,11,8,'F'),
+  ...range(2,11,9,'F'),
+  ...range(2,11,10,'F'),
+  [2,11,'D'],[3,11,'D'],...range(4,9,11,'F'),[10,11,'D'],[11,11,'D'],
+  ...range(3,10,12,'D'),
+  ...range(2,11,13,'O'),
+  [1,14,'P'],...range(2,4,14,'O'),...range(5,8,14,'A'),...range(9,11,14,'O'),[12,14,'P'],
+  [0,15,'P'],[1,15,'P'],...range(4,11,15,'A'),
+];
+const FACE_IDLE=[
+  [4,7,'K'],[5,7,'K'],[8,7,'K'],[9,7,'K'],
+  [4,8,'K'],[9,8,'K'],
+  ...range(3,10,9,'M'),
+  [6,10,'D'],[7,10,'D'],
+];
+const FACE_ANGRY=[
+  [4,6,'K'],[5,6,'K'],[8,6,'K'],[9,6,'K'],
+  [3,8,'X'],[4,8,'X'],[9,8,'X'],[10,8,'X'],
+  ...range(3,10,9,'M'),
+  ...range(5,8,10,'X'),
+  [6,11,'X'],[7,11,'X'],
+];
+function shadowStr(map){return map.map(([x,y,c])=>(x*UNIT)+'px '+(y*UNIT)+'px 0 0 '+CHEF_PALETTE[c]).join(',');}
+function setFace(map){document.getElementById('chefFace').style.boxShadow=shadowStr(map);}
+document.getElementById('chefBase').style.boxShadow=shadowStr(CHEF_BASE);
+setFace(FACE_IDLE);
+
+const IDLE_LINES=['ไป ไป ไป!','ลากเลย!','ของแซ่บอยู่นั่น!','เวลาไม่คอยใคร!','ลงครกซะ!','นี่ก๊วนลาบ บ่ใช่ก๊วนซอส!','ตาไว มือไว!','ไวๆ ของจะหายแล้ว!','อย่าให้หลุดมือเด้อ!'];
+const ANGRY_LINES={
+  mayo:['เห้ย!! มายองมาทำไม!!','นี่ลาบ บ่ใช่แซนวิช!!'],
+  cheese:['ชีส?? เอาไปไกลๆ!!','นี่บ่ใช่พิซซ่าเด้อ!!'],
+  tomato:['มะเขือเทศ?? ออกไปก่อน!!','จะให้ลาบเปรี้ยวหวานไปไหน!!'],
+  milk:['นมนี่!? จะให้ลาบนวลไหม!!','บ่เอานมเด้อพี่!!'],
+  unknown:['ไม่รู้ๆ ก็ไปหาคำตอบมาก่อน!!','มาทำไมถ้าบ่รู้!!'],
+  flirty:['เจ้าชู้ ออกไปไกลๆ อีหล้า!!','มาจีบ บ่ใช่มาทำลาบ!!'],
+};
+let chefTimer=null;
+function setBubble(t){document.getElementById('bubble').textContent=t;}
+function chefIdleCycle(){
+  setBubble(IDLE_LINES[Math.floor(Math.random()*IDLE_LINES.length)]);
+  chefTimer=setTimeout(chefIdleCycle,2800+Math.random()*1300);
+}
+function chefAngry(key){
+  clearTimeout(chefTimer);
+  const sprite=document.getElementById('chefSprite');
+  sprite.classList.remove('angry');
+  void sprite.offsetWidth; // restart animation
+  sprite.classList.add('angry');
+  setFace(FACE_ANGRY);
+  const lines=ANGRY_LINES[key]||ANGRY_LINES.unknown;
+  setBubble(lines[Math.floor(Math.random()*lines.length)]);
+  setTimeout(()=>{
+    sprite.classList.remove('angry');
+    setFace(FACE_IDLE);
+    chefIdleCycle();
+  },1500);
+}
+const GOLD_LINES=['โอ้โห! ของเทพ!! ซอยต่อ!','เทพมาแล้ว! คอมโบเด้ง!','ของล้ำ! แต้มคูณสอง!','จัดมา! นี่แหละของแซ่บตัวจริง!'];
+function chefHype(){
+  clearTimeout(chefTimer);
+  setBubble(GOLD_LINES[Math.floor(Math.random()*GOLD_LINES.length)]);
+  chefTimer=setTimeout(chefIdleCycle,1300);
+}
+
+/* ---------------- GAME ---------------- */
+const GOOD=[
+  {e:'🌶️',n:'พริก',cat:'spicy'},
+  {e:'🍚',n:'ข้าวคั่ว',cat:'trad'},
+  {e:'🥩',n:'เนื้อสับ',cat:'trad'},
+  {e:'🌿',n:'ผักชีฝรั่ง',cat:'herb'},
+  {e:'🫚',n:'สะระแหน่',cat:'herb'},
+  {e:'🧅',n:'หอมแดง',cat:'herb'},
+  {e:'🐟',n:'ปลาแดก',cat:'bold'},
+  {e:'🍋',n:'มะนาว',cat:'creative'},
+];
+const BAD=[
+  {e:'🥫',n:'มายองเนส',key:'mayo'},
+  {e:'🧀',n:'ชีส',key:'cheese'},
+  {e:'🍅',n:'มะเขือเทศ',key:'tomato'},
+  {e:'🥛',n:'นม',key:'milk'},
+  {e:'🤷',n:'ไม่รู้ๆๆๆ',key:'unknown'},
+  {e:'😏',n:'คนเจ้าชู้',key:'flirty'},
+];
+let G;
+function freshState(){return{score:0,combo:1,time:25,running:false,badDrops:0,taps:0,duration:0,
+  counts:{spicy:0,trad:0,herb:0,bold:0,creative:0}};}
+function startGame(){
+  document.getElementById('startov').style.display='none';
+  G=freshState();G.running=true;G.startAt=Date.now();
+  updateHUD();
+  setFace(FACE_IDLE);chefIdleCycle();
+  G.timer=setInterval(()=>{G.time--;updateHUD();if(G.time<=0)endGame();},1000);
+  G.spawner=setInterval(spawn,580);
+  G.raf=requestAnimationFrame(physicsTick);
+  for(let i=0;i<4;i++)spawn();
+}
+function updateHUD(){
+  document.getElementById('time').textContent=Math.max(0,G.time);
+  document.getElementById('score').textContent=G.score;
+  document.getElementById('combo').textContent='x'+G.combo;
+  document.getElementById('meter').style.width=Math.min(100,G.score/2)+'%';
+  document.getElementById('time').closest('.box').classList.toggle('low',G.time<=5&&G.time>0);
+}
+function spawn(){
+  if(!G||!G.running)return;
+  const arena=document.getElementById('arena');
+  if(arena.querySelectorAll('.chip').length>=7)return;
+  const bad=Math.random()<0.32;
+  const golden=!bad&&Math.random()<0.14;
+  const item=bad
+    ? Object.assign({bad:true},BAD[Math.floor(Math.random()*BAD.length)])
+    : Object.assign({bad:false,golden:golden},GOOD[Math.floor(Math.random()*GOOD.length)]);
+  const chip=document.createElement('button');
+  chip.className='chip'+(bad?' bad':'')+(golden?' golden':'');
+  chip.innerHTML=(golden?'✨':'')+item.e+'<small>'+item.n+'</small>';
+  const w=arena.clientWidth,h=arena.clientHeight,size=62;
+  const x=Math.random()*Math.max(10,w-size);
+  const y=72+Math.random()*Math.max(10,h-72-size);
+  chip.style.left=x+'px';chip.style.top=y+'px';
+  chip._vx=(Math.random()<0.5?-1:1)*(1.4+Math.random()*1.8);
+  chip._vy=(Math.random()<0.5?-1:1)*(1.4+Math.random()*1.8);
+  arena.appendChild(chip);
+  attachDrag(chip,item);
+  scheduleLife(chip,item);
+}
+function scheduleLife(chip,item){
+  const life=item.golden?2600:4000;
+  const warnAt=life-1100;
+  chip._warnT=setTimeout(()=>{
+    if(!chip._dragging&&!chip._resolved)chip.classList.add('warn');
+  },warnAt);
+  chip._life=setTimeout(()=>{
+    if(!chip._dragging&&!chip._resolved){
+      chip.style.transition='opacity .25s';chip.style.opacity='0';
+      setTimeout(()=>chip.remove(),250);
+    }
+  },life);
+}
+function physicsTick(){
+  if(!G||!G.running)return;
+  const arena=document.getElementById('arena');
+  const w=arena.clientWidth,h=arena.clientHeight;
+  arena.querySelectorAll('.chip').forEach(chip=>{
+    if(chip._dragging||chip._resolved)return;
+    const cw=chip.offsetWidth||62,ch=chip.offsetHeight||62;
+    let x=parseFloat(chip.style.left)||0, y=parseFloat(chip.style.top)||0;
+    let vx=chip._vx, vy=chip._vy;
+    x+=vx;y+=vy;
+    if(x<=0){x=0;vx=Math.abs(vx);}
+    if(x>=w-cw){x=w-cw;vx=-Math.abs(vx);}
+    if(y<=70){y=70;vy=Math.abs(vy);}
+    if(y>=h-ch){y=h-ch;vy=-Math.abs(vy);}
+    chip.style.left=x+'px';chip.style.top=y+'px';
+    chip._vx=vx;chip._vy=vy;
+  });
+  G.raf=requestAnimationFrame(physicsTick);
+}
+function overlapsPot(chip){
+  const pr=document.getElementById('pot').getBoundingClientRect();
+  const cr=chip.getBoundingClientRect();
+  const cx=cr.left+cr.width/2, cy=cr.top+cr.height/2;
+  return cx>pr.left-8 && cx<pr.right+8 && cy>pr.top+6;
+}
+function attachDrag(chip,item){
+  chip.addEventListener('pointerdown',e=>{
+    if(chip._resolved)return;
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    chip.classList.add('dragging');
+    chip.classList.remove('warn');
+    clearTimeout(chip._life);clearTimeout(chip._warnT);
+    const ar=document.getElementById('arena').getBoundingClientRect();
+    const r=chip.getBoundingClientRect();
+    chip._offX=e.clientX-r.left;chip._offY=e.clientY-r.top;
+    chip._dragging=true;
+  });
+  chip.addEventListener('pointermove',e=>{
+    if(!chip._dragging)return;
+    const arena=document.getElementById('arena');
+    const ar=arena.getBoundingClientRect();
+    const cw=chip.offsetWidth,ch=chip.offsetHeight;
+    let x=e.clientX-ar.left-chip._offX;
+    let y=e.clientY-ar.top-chip._offY;
+    x=Math.max(0,Math.min(ar.width-cw,x));
+    y=Math.max(0,Math.min(ar.height-ch,y));
+    chip.style.left=x+'px';chip.style.top=y+'px';
+    document.getElementById('pot').classList.toggle('target',overlapsPot(chip));
+  });
+  function release(e){
+    if(!chip._dragging)return;
+    chip._dragging=false;chip.classList.remove('dragging');
+    document.getElementById('pot').classList.remove('target');
+    if(overlapsPot(chip)){
+      resolveDrop(chip,item);
+    }else{
+      chip._vx=(Math.random()-0.5)*3.4;
+      chip._vy=-(1.2+Math.random()*1.8);
+      scheduleLife(chip,item);
+    }
+  }
+  chip.addEventListener('pointerup',release);
+  chip.addEventListener('pointercancel',release);
+}
+function resolveDrop(chip,item){
+  if(chip._resolved)return;
+  chip._resolved=true;
+  clearTimeout(chip._warnT);
+  chip.classList.remove('warn');
+  chip.style.animation='none';
+  const arena=document.getElementById('arena');
+  const splat=document.createElement('div');
+  splat.className='splat';
+  splat.style.left=chip.style.left;splat.style.top=chip.style.top;
+  if(item.bad){
+    G.combo=1;G.score=Math.max(0,G.score-6);G.badDrops++;
+    splat.textContent='ยี้! -6';splat.style.color='var(--chili-dk)';
+    arena.classList.add('shake');setTimeout(()=>arena.classList.remove('shake'),300);
+    chefAngry(item.key);
+  }else{
+    const mult=item.golden?2:1;
+    const gain=3*G.combo*mult;G.score+=gain;G.combo=Math.min(9,G.combo+1);
+    G.counts[item.cat]++;G.taps++;
+    splat.textContent='+'+gain+(item.golden?' ✨':'');
+    splat.style.color=item.golden?'#caa400':'var(--chili)';
+    if(item.golden)chefHype();
+  }
+  arena.appendChild(splat);setTimeout(()=>splat.remove(),650);
+  chip.style.transition='transform .15s ease,opacity .15s ease';
+  chip.style.transform='scale(0)';chip.style.opacity='0';
+  setTimeout(()=>chip.remove(),160);
+  updateHUD();
+}
+function endGame(){
+  G.running=false;clearInterval(G.timer);clearInterval(G.spawner);
+  cancelAnimationFrame(G.raf);clearTimeout(chefTimer);
+  G.duration=(Date.now()-G.startAt)/1000;
+  document.querySelectorAll('.chip').forEach(c=>c.remove());
+  document.getElementById('chefSprite').classList.remove('angry');
+  setFace(FACE_IDLE);
+  go(2);
+}
+function resetGame(){
+  document.getElementById('startov').style.display='flex';
+  document.getElementById('time').textContent='25';
+  document.getElementById('score').textContent='0';
+  document.getElementById('combo').textContent='x1';
+  document.getElementById('meter').style.width='0';
+  document.getElementById('time').closest('.box').classList.remove('low');
+  setBubble('เดี๋ยวเชฟจะบอกสูตรลับ... เตรียมมือไว้!');
+  go(1);
+}
+
+/* ---------------- RESULT ---------------- */
+const FORTUNES=[
+  'สัปดาห์นี้ดวงแซ่บพุ่ง เจอใครชวนกินลาบห้ามปฏิเสธ จะมีโชคเรื่องน้ำจิ้มแจ่ว',
+  'ระวังคนใกล้ตัวแอบขโมยข้าวคั่ว แนะนำให้กำข้าวเหนียวไว้แน่นๆ',
+  'ดวงการเงินดี มีเกณฑ์ได้คนอื่นเลี้ยงลาบ จงรับไว้อย่างสง่างาม',
+  'ความรักรุ่ง คนที่กินเผ็ดเท่ากันคือเนื้อคู่ อย่าปล่อยให้หลุดมือ',
+  'มีเกณฑ์เจอลาบเจ้าใหม่ที่ถูกปาก แต่จงระวังร้านที่ใส่น้ำตาล',
+  'ดาวพริกโคจรเข้าราศี เหมาะแก่การเป็นคนตั้งวงและสั่งโต๊ะ',
+  'เชฟใหญ่จับตาดูอยู่ ถ้าสัปดาห์นี้มีคนเอามายองมาวางใกล้ลาบ ให้รีบเขี่ยออกก่อนสายตัวแตก',
+];
+const ARCH={
+  rookie:{rank:'พลทหารมือใหม่',desc:'เพิ่งเข้าค่าย มือยังลั่น ลากของยังไม่ทันใจ แต่ใจสู้ไม่แพ้ใคร ฝึกอีกหน่อยรับรองไปได้สวย',role:'ผู้ช่วยล้างจาน เก็บผักเตรียมไว้ก่อนรอบหน้า'},
+  chili:{rank:'จ่าซอยพริก',desc:'สายเผ็ดพันธุ์แท้ พริกน้อยถือว่าดูถูก ลิ้นชาแล้วยังลากเพิ่ม เป็นมาตรวัดความแซ่บประจำโต๊ะที่ทุกคนยำเกรง',role:'คนคุมระดับความเผ็ด และท้าเพื่อนกินพริกสด'},
+  purist:{rank:'สิบเอกข้าวคั่ว',desc:'จอมพิถีพิถัน ข้าวคั่วต้องหอม สัดส่วนต้องเป๊ะ จับผิดสูตรร้านได้ในคำแรก เป็นที่ปรึกษาด้านความถูกต้องของลาบ',role:'นักชิมประจำก๊วน คนตัดสินว่าลาบจานนี้ของแท้ไหม'},
+  herbal:{rank:'สิบโทใบหอม',desc:'สายผักเต็มครก สะระแหน่ ผักชีฝรั่ง หอมแดงต้องมาครบ มือไวเรื่องผักจนเพื่อนแซวว่ามากินผักหรือกินลาบ',role:'คนจัดผักแนม และคนเตือนให้กินผักด้วยเดี๋ยวเสียสมดุล'},
+  fusion:{rank:'ผู้กองลาบฟิวชั่น',desc:'หัวก้าวหน้า กล้าลองของใหม่ ลาบแซลมอน ลาบทูน่า อะไรก็จัด เปิดโลกความแซ่บให้เพื่อนได้เสมอ (บางทีก็เกินไปหน่อย)',role:'คนคิดเมนูแปลกใหม่ และพาก๊วนไปร้านลับ'},
+  padaek:{rank:'พลทหารปลาแดก',desc:'สายจัดหนัก น้ำปลาร้าต้องนัว กลิ่นแรงคือเสน่ห์ เป็นที่รักของสายแซ่บแท้และเป็นที่หวั่นเกรงของสายกลิ่น',role:'คนเติมความนัว และยืนยันว่าต้องใส่ปลาแดก'},
+  chill:{rank:'ทหารพรานสายชิล',desc:'ไม่เร่ง ไม่รีบ มากินเพื่อบรรยากาศและเพื่อนฝูงเป็นหลัก ลาบแบบไหนก็อร่อยถ้าได้นั่งกับก๊วน เป็นกาวใจที่ทำให้วงไม่แตก',role:'คนคุมบรรยากาศ ชวนคุย และเก็บตกของที่เหลือ'},
+  general:{rank:'นายพลลาบดิบ',desc:'ผู้นำสายบุก ลากไว สั่งเก่ง สูตรแน่นไม่มีพลาด ใครอยู่ใกล้เป็นต้องตามไปกินลาบด้วยทุกครั้ง คือเสาหลักความแซ่บของก๊วน',role:'หัวหน้าทีม คนตั้งวงและตัดสินว่าร้านไหนผ่าน'},
+  dodger:{rank:'หน่วยสายลับลาบ',desc:'ตาไวมือไว ของแปลกปลอมหลุดเข้าครกไม่ได้แม้แต่ชิ้นเดียว ทำงานเงียบแต่ผลงานเป๊ะ เป็นที่ไว้วางใจของก๊วนเรื่องคัดของก่อนเข้าโต๊ะ',role:'คนตรวจของก่อนเข้าครก ไม่ให้ของปลอมหลุดผ่าน'},
+  legend:{rank:'จอมพลลาบ ตำนานเดินดิน',desc:'ระดับนี้ไม่มีใครในก๊วนกล้าทาบรัศมี ลากไว แม่นยำ ครบสูตรทุกองค์ประกอบ คือตำนานที่เพื่อนจะเล่าขานทุกครั้งที่ไปกินลาบ',role:'ตำแหน่งกิตติมศักดิ์ สั่งอะไรก็ได้ไม่ต้องจ่าย (ในทางทฤษฎี)'},
+};
+function pickType(){
+  if(!G)return 'rookie';
+  const c=G.counts, sc=G.score, total=G.taps, bad=G.badDrops;
+  const rate=G.duration?total/G.duration:0;
+  if(total<=3||sc<15)return 'rookie';
+  if(bad===0&&total>=8&&sc>=50)return 'dodger';
+  if(sc>=170)return 'legend';
+  const buckets=[['chili',c.spicy],['purist',c.trad],['herbal',c.herb],['fusion',c.creative],['padaek',c.bold]];
+  buckets.sort((a,b)=>b[1]-a[1]);
+  if(total>=14&&rate>=0.5&&(c.trad+c.spicy)>=total*0.5)return 'general';
+  if(buckets[0][1]===0||rate<0.4)return 'chill';
+  return buckets[0][0];
+}
+function renderResult(){
+  const key=pickType();const a=ARCH[key];
+  const sc=G?G.score:0;
+  document.getElementById('rank').textContent=a.rank;
+  document.getElementById('who').textContent='นามเรียกขาน: '+playerName();
+  document.getElementById('rscore').textContent=sc;
+  document.getElementById('desc').textContent=a.desc;
+  document.getElementById('role').textContent=a.role;
+  const c=G?G.counts:{spicy:1,trad:1,herb:1,bold:1,creative:1};
+  const rate=G&&G.duration?G.taps/G.duration:0.8;
+  const total=G?Math.max(1,G.taps):1;
+  const bad=G?G.badDrops:0;
+  function pct(v){return Math.round(Math.max(8,Math.min(92,v)))}
+  const spicy=pct((c.spicy/total)*260+15);
+  const fast=pct(rate*55+10);
+  const creat=pct((c.creative/total)*300+12);
+  const squad=pct((total/22)*100);
+  const steady=pct(100-(bad/(total+bad||1))*140);
+  const bars=[
+    ['นัว/สมุนไพร','เผ็ดจัด',spicy],
+    ['สายชิล','สายไว',fast],
+    ['ดั้งเดิม','ครีเอทีฟ',creat],
+    ['สายเดี่ยว','สายก๊วน',squad],
+    ['มือลั่น','มือนิ่ง',steady],
+  ];
+  document.getElementById('bars').innerHTML=bars.map(b=>`
+    <div class="bar"><div class="blab"><span class="lo">${b[0]}</span><span class="hi">${b[1]}</span></div>
+    <div class="track"><div class="fill" style="width:${b[2]}%"></div></div></div>`).join('');
+  const seed=(sc+playerName().length+key.length)%FORTUNES.length;
+  document.getElementById('fortune').textContent=FORTUNES[seed];
+}
+
+/* ---------------- WHEEL OF FATE ---------------- */
+const MISSION='ภารกิจ: มึงจองโต๊ะให้ด้วยจ้าาา 🍽️📞';
+const SEGMENTS=[
+  {e:'🤑',text:MISSION},
+  {e:'🌶️',text:MISSION},
+  {e:'🚫',text:MISSION},
+  {e:'👑',text:MISSION},
+  {e:'⏰',text:MISSION},
+  {e:'📸',text:MISSION},
+  {e:'🥄',text:MISSION},
+  {e:'🎤',text:MISSION},
+];
+function buildWheel(){
+  const wheel=document.getElementById('wheel');
+  SEGMENTS.forEach((s,i)=>{
+    const w=document.createElement('div');
+    w.className='wedge';
+    w.style.transform='rotate('+(i*45)+'deg) translate(-12px,-82px) rotate('+(-(i*45))+'deg)';
+    w.textContent=s.e;
+    wheel.appendChild(w);
+  });
+}
+buildWheel();
+let currentRot=0,spinning=false,wheelResult=null;
+function spinWheel(){
+  if(spinning)return;
+  spinning=true;
+  const btn=document.getElementById('spinBtn');
+  btn.disabled=true;
+  const idx=Math.floor(Math.random()*SEGMENTS.length);
+  let delta=((-idx*45)-currentRot)%360; if(delta<0)delta+=360;
+  currentRot+=delta+4*360;
+  document.getElementById('wheel').style.transform='rotate('+currentRot+'deg)';
+  document.getElementById('stamp').classList.remove('show');
+  setTimeout(()=>{
+    const stamp=document.getElementById('stamp');
+    wheelResult=SEGMENTS[idx].e+' '+SEGMENTS[idx].text;
+    stamp.innerHTML='<div class="badge">📌 ภารกิจมาแล้ว</div><p>'+wheelResult+'</p>';
+    stamp.classList.add('show');
+    spinning=false;btn.disabled=false;btn.textContent='หมุนอีกที (ก็ได้ผลเดิมแหละ) 🎯';
+  },3300);
+}
+const DOW=['อา','จ','อ','พ','พฤ','ศ','ส'];
+const WD_FULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const PLACE='ร้านลาบสตูดิโอ';
+function fmtThai(d){return DOW[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()];}
+function dateForWeekday(target){
+  const d=new Date();d.setHours(0,0,0,0);
+  const diff=(target-d.getDay()+7)%7;
+  d.setDate(d.getDate()+diff);
+  return d;
+}
+let chosenDate=null,chosenTimeStr=null;
+function checkReady(){
+  document.getElementById('checkBtn').disabled=!(chosenDate&&chosenTimeStr);
+}
+function buildDateTime(){
+  const wrap=document.getElementById('dayChips');
+  for(let wd=1;wd<=4;wd++){
+    const d=dateForWeekday(wd);
+    const btn=document.createElement('button');
+    btn.innerHTML=WD_FULL[wd]+'<br><small>'+d.getDate()+' '+MON[d.getMonth()]+'</small>';
+    btn.addEventListener('click',()=>{
+      chosenDate=d;
+      [...wrap.children].forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      checkReady();
+    });
+    wrap.appendChild(btn);
+  }
+  document.querySelectorAll('#timeChips button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      chosenTimeStr=btn.dataset.t;
+      document.querySelectorAll('#timeChips button').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      checkReady();
+    });
+  });
+}
+buildDateTime();
+function timeLabelShort(){return chosenTimeStr==='20:00'?'2 ทุ่ม':'1 ทุ่ม';}
+function eventData(){
+  if(!chosenDate||!chosenTimeStr){toast('เลือกวันและเวลาก่อนเด้อ');return null;}
+  const place=PLACE;
+  const [h,mi]=chosenTimeStr.split(':').map(Number);
+  const start=new Date(chosenDate);start.setHours(h,mi,0,0);
+  const end=new Date(start.getTime()+2*3600*1000);
+  return{start,end,place,title:'🌶️ ก๊วนลาบบุก! ('+playerName()+'ชวน)',
+    detail:'ภารกิจกินลาบกับก๊วน นำโดย '+playerName()+' • ผู้ใดไม่มาถือว่าสละสิทธิ์ความแซ่บ'};
+}
+function stamp(d){return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')
+  +'T'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'00';}
+function showConfirm(e){const c=document.getElementById('confirm');
+  c.classList.add('show');c.innerHTML='✅ ล็อกแล้ว: <b>'+fmtThai(e.start)+'</b> เวลา '
+    +String(e.start.getHours()).padStart(2,'0')+':'+String(e.start.getMinutes()).padStart(2,'0')+' ที่ '+e.place;}
+function addGoogle(){const e=eventData();if(!e)return;
+  const url='https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+encodeURIComponent(e.title)
+    +'&dates='+stamp(e.start)+'/'+stamp(e.end)
+    +'&details='+encodeURIComponent(e.detail)
+    +'&location='+encodeURIComponent(e.place);
+  window.open(url,'_blank');showConfirm(e);}
+function downloadICS(){const e=eventData();if(!e)return;
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//KuanLarb//TH','BEGIN:VEVENT',
+    'UID:'+Date.now()+'@kuanlarb','DTSTAMP:'+stamp(new Date()),
+    'DTSTART:'+stamp(e.start),'DTEND:'+stamp(e.end),
+    'SUMMARY:'+e.title,'DESCRIPTION:'+e.detail,'LOCATION:'+e.place,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([ics],{type:'text/calendar'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='kuan-larb.ics';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);showConfirm(e);toast('ดาวน์โหลดไฟล์ปฏิทินแล้ว');}
+
+/* ---------------- APPLICATION DOCUMENT ---------------- */
+function renderApplication(){
+  const key=pickType();const a=ARCH[key];
+  const sc=G?G.score:0;
+  const dayLabel=chosenDate?WD_FULL[chosenDate.getDay()]+' '+chosenDate.getDate()+' '+MON[chosenDate.getMonth()]:'-';
+  const place=PLACE;
+  const wr=wheelResult||'ยังไม่หมุนวงล้อ (ถือว่าผ่านแบบลอยตัวไปก่อน)';
+  document.getElementById('docCard').innerHTML=
+    '<div class="stamp2">อนุมัติ ✅</div>'
+    +'<div class="doc-row"><span class="dl">ชื่อทหาร</span><span>'+playerName()+'</span></div>'
+    +'<div class="doc-row"><span class="dl">ยศที่ได้รับ</span><span>'+a.rank+' ('+sc+' แต้มแซ่บ)</span></div>'
+    +'<div class="doc-row"><span class="dl">หน้าที่ในก๊วน</span><span>'+a.role+'</span></div>'
+    +'<div class="doc-row"><span class="dl">เวรกรรม</span><span>'+wr+'</span></div>'
+    +'<div class="doc-row"><span class="dl">วันนัด</span><span>'+dayLabel+'</span></div>'
+    +'<div class="doc-row"><span class="dl">เวลา</span><span>'+timeLabelShort()+' ตรง ('+chosenTimeStr+')</span></div>'
+    +'<div class="doc-row"><span class="dl">สถานที่</span><span>'+place+'</span></div>';
+}
+function sendApplication(){
+  const key=pickType();const a=ARCH[key];
+  const sc=G?G.score:0;
+  const dayLabel=chosenDate?WD_FULL[chosenDate.getDay()]+' '+chosenDate.getDate()+' '+MON[chosenDate.getMonth()]:'-';
+  const place=PLACE;
+  const subject='ชื่อทหาร '+playerName()+' เวลาที่สะดวกกินลาบ '+dayLabel+' '+timeLabelShort()+' ที่ '+place;
+  const body=[
+    '📋 เอกสารตรวจคุณสมบัติเข้ากองพันทหารลาบ',
+    '——————————————',
+    'ชื่อทหาร: '+playerName(),
+    'ยศที่ได้รับ: '+a.rank+' ('+sc+' แต้มแซ่บ)',
+    'หน้าที่ในก๊วน: '+a.role,
+    '',
+    '🔮 ดวงลาบประจำสัปดาห์: '+(document.getElementById('fortune').textContent||'-'),
+    '🎯 ผลวงล้อเวรกรรม: '+(wheelResult||'ยังไม่หมุนวงล้อ (ถือว่าผ่านแบบลอยตัวไปก่อน)'),
+    '',
+    '📅 วันนัด: '+dayLabel,
+    '⏰ เวลา: '+timeLabelShort()+' ตรง ('+chosenTimeStr+')',
+    '📍 สถานที่: '+place,
+    '',
+    'ลงชื่อ ........................................ (กดส่งแล้วถือว่ายอมรับเงื่อนไขทุกข้อ ห้ามเบี้ยว)'
+  ].join('\n');
+  window.location.href='mailto:amfinethx.rock@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+</script>
+</body>
+</html>
